@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'btserial.ui'
+# Form implementation generated from reading ui file 'BTSerialUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.5.1
 #
@@ -16,7 +16,6 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.listWidgetCommands = QtWidgets.QListWidget(self.centralwidget)
@@ -131,9 +130,8 @@ class Ui_MainWindow(object):
         self.actionDisconnect = QtWidgets.QAction(MainWindow)
         self.actionDisconnect.setObjectName("actionDisconnect")
         self.actionQuit = QtWidgets.QAction(MainWindow)
+        self.actionQuit.setMenuRole(QtWidgets.QAction.QuitRole)
         self.actionQuit.setObjectName("actionQuit")
-        self.actionQuit.setShortcut("Ctrl+Q")
-        self.actionQuit.triggered.connect(qApp.quit)
         self.actionSettings = QtWidgets.QAction(MainWindow)
         self.actionSettings.setObjectName("actionSettings")
         self.actionSaveList = QtWidgets.QAction(MainWindow)
@@ -152,6 +150,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuCommands.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.actionQuit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -191,6 +190,7 @@ class Ui_MainWindow(object):
         self.actionConnect.setText(_translate("MainWindow", "Connect"))
         self.actionDisconnect.setText(_translate("MainWindow", "Disconnect"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
+        self.actionQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionSaveList.setText(_translate("MainWindow", "Save list"))
 
