@@ -1,0 +1,13 @@
+{
+	"commands": [
+		{
+			"name": "command1",
+			"code": "CMD1%:%",
+			"description": "command 1 description"
+		}, {
+			"name": "command2",
+			"code": "CMD2%:%",
+			"description": "command 2 description"
+		}
+	]
+}
