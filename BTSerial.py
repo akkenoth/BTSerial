@@ -1,3 +1,4 @@
+import sys
 import json
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
@@ -44,7 +45,7 @@ class BTSerial(QMainWindow):
 			return
 
 		pprint(data)
-		print("data parsed!")
+		sys.stdout.flush()
 
 
 	def closeEvent(self, event):
