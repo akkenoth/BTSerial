@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QListWidgetItem
 
-class Command(QListWidgetItem):
+class CommandItem(QListWidgetItem):
 	name = None
 	code = None
 	description = None
