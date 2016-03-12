@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>BTSerialMainWindow</class>
+ <widget class="QMainWindow" name="BTSerialMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>530</height>
+    <width>770</width>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,17 +16,57 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayoutCommands">
+      <item>
+       <widget class="QLabel" name="labelCommandList">
+        <property name="font">
+         <font>
+          <family>Cambria</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Available commands</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QListWidget" name="listWidgetCommands">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
         <item>
          <property name="text">
-          <string>Polecenie 1</string>
+          <string notr="true">Polecenie 1</string>
+         </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="statusTip">
+          <string notr="true"/>
+         </property>
+         <property name="whatsThis">
+          <string notr="true"/>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Polecenie 2</string>
+          <string notr="true">Polecenie 2</string>
+         </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="statusTip">
+          <string notr="true"/>
+         </property>
+         <property name="whatsThis">
+          <string notr="true"/>
          </property>
         </item>
        </widget>
@@ -36,7 +76,7 @@
         <item>
          <widget class="QPushButton" name="pushButtonAddCommand">
           <property name="text">
-           <string>Add command</string>
+           <string>New command...</string>
           </property>
          </widget>
         </item>
@@ -59,7 +99,33 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayoutQueue">
+      <item>
+       <widget class="QLabel" name="labelQueue">
+        <property name="font">
+         <font>
+          <family>Cambria</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Command queue</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QListWidget" name="listWidgetQueue">
         <item>
@@ -118,7 +184,33 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayoutLog">
+      <item>
+       <widget class="QLabel" name="labelLog">
+        <property name="font">
+         <font>
+          <family>Cambria</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Log</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QListWidget" name="listWidgetLog">
         <item>
@@ -185,7 +277,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>770</width>
      <height>21</height>
     </rect>
    </property>
@@ -261,22 +353,5 @@
   </action>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>actionQuit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>264</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
