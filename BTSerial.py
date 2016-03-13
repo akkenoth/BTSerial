@@ -125,10 +125,22 @@ class BTSerial(QMainWindow):
 		pass
 
 	def moveCommandUpQueue(self):
-		pass
+		count = self.ui.listWidgetQueue.count()
+		row = self.ui.listWidgetQueue.currentRow()
+		if (count <= 1) or (row == 0):
+			return
+		commandItem = self.ui.listWidgetQueue.takeItem(row)
+		self.ui.listWidgetQueue.insertItem(row - 1, commandItem)
+		self.ui.listWidgetQueue.setCurrentRow(row - 1)
 	
 	def moveCommandDownQueue(self):
-		pass
+		count = self.ui.listWidgetQueue.count()
+		row = self.ui.listWidgetQueue.currentRow()
+		if (count <= 1) or (row == count - 1):
+			return
+		commandItem = self.ui.listWidgetQueue.takeItem(row)
+		self.ui.listWidgetQueue.insertItem(row + 1, commandItem)
+		self.ui.listWidgetQueue.setCurrentRow(row + 1)
 
 	def deleteCommandFromQueue(self):
 		commandItem = self.ui.listWidgetQueue.currentItem()
@@ -139,11 +151,7 @@ class BTSerial(QMainWindow):
 		if commandItem.delay == 0:
 			confirmation = QMessageBox.question(self, "BTSerial - Confirm delete", "Confirm deleting command from queue", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
 		if confirmation == QMessageBox.Yes:
-			print("delete confirmed\n")
 			self.ui.listWidgetQueue.takeItem(self.ui.listWidgetQueue.row(commandItem))
-		else:
-			print("delete canceled\n")
-
 
 	def executeCommands(self):
 		pass
