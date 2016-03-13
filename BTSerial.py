@@ -17,38 +17,35 @@ class BTSerial(QMainWindow):
 		self.setupUIActions()
 
 	def setupUIActions(self):
-		self.ui.pushButtonAddToQueue.clicked.connect(self.addCommandToQueue)
-		self.ui.listWidgetCommands.setSortingEnabled(True)
-		self.ui.listWidgetCommands.itemDoubleClicked.connect(self.addCommandToQueue)
-		self.ui.actionQuit.triggered.connect(self.closeConfirmation)
+		self.ui.actionConnect.triggered.connect(self.connectToDevice)
+		self.ui.actionDisconnect.triggered.connect(self.disconnectFromDevice)
+		self.ui.actionLoad.triggered.connect(self.loadCommandQueue)
 		self.ui.actionLoadList.triggered.connect(self.loadCommandList)
+		self.ui.actionQuit.triggered.connect(self.closeConfirmation)
+		self.ui.actionSave.triggered.connect(self.saveCommandQueue)
+		self.ui.actionSaveList.triggered.connect(self.saveCommandList)
+		self.ui.actionSettings.triggered.connect(self.openSettings)
+		self.ui.listWidgetCommands.itemDoubleClicked.connect(self.addCommandToQueue)
+		self.ui.listWidgetCommands.setSortingEnabled(True)
+		self.ui.pushButtonAddCommand.clicked.connect(self.createNewCommand)
+		self.ui.pushButtonAddDelay.clicked.connect(self.addDelayToQueue)
+		self.ui.pushButtonAddToQueue.clicked.connect(self.addCommandToQueueButtonWrapper)
+		self.ui.pushButtonDeleteCommand.clicked.connect(self.deleteCommandFromQueue)
+		self.ui.pushButtonExecute.clicked.connect(self.executeCommands)
+		self.ui.pushButtonMoveCommandDown.clicked.connect(self.moveCommandDownQueue)
+		self.ui.pushButtonMoveCommandUp.clicked.connect(self.moveCommandUpQueue)
 
-	def addCommandToQueue(self, commandType):
-		if commandType is None:
-			commandType = self.ui.listWidgetCommands.currentItem()
-		if commandType is None:
-			return
-		cmdParams = []
-		code = commandType.code
-		inputOk = True
-		for i in range(len(code)):
-			if code[i] is not '%':
-				continue
-			# Unsafe!
-			if code[i+1] == '1':
-				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
-				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 255)
-			elif code[i+1] == '2':
-				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
-				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 65535)
-			else:
-				QMessageBox.warning(self, "BTSerial - Error", "Invalid command code, cannot parse.", QMessageBox.Ok, QMessageBox.Ok)
-				return
-			if inputOk == False:
-				return
-			cmdParams.append(int(value))
-		item = CommandItem(0, commandType, cmdParams)
-		self.ui.listWidgetQueue.addItem(item)
+	def connectToDevice(self):
+		pass
+
+	def disconnectFromDevice(self):
+		pass
+
+	def openSettings(self):
+		pass
+
+	def applySettings(self):
+		pass
 
 	def loadCommandList(self):
 		# Add confirmation if there are commands on the list
@@ -83,6 +80,73 @@ class BTSerial(QMainWindow):
 		self.ui.listWidgetCommands.clear()
 		for c in commandTypeList:
 			self.ui.listWidgetCommands.addItem(c)
+
+	def saveCommandList(self):
+		pass
+
+	def loadCommandQueue(self):
+		pass
+
+	def saveCommandQueue(self):
+		pass
+
+	def createNewCommand(self):
+		pass
+
+	def addCommandToQueueButtonWrapper(self):
+		self.addCommandToQueue(self.ui.listWidgetCommands.currentItem())
+
+	def addCommandToQueue(self, commandType):
+		if commandType is None:
+			return
+		cmdParams = []
+		code = commandType.code
+		inputOk = True
+		for i in range(len(code)):
+			if code[i] is not '%':
+				continue
+			# Unsafe!
+			if code[i+1] == '1':
+				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
+				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 255)
+			elif code[i+1] == '2':
+				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
+				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 65535)
+			else:
+				QMessageBox.warning(self, "BTSerial - Error", "Invalid command code, cannot parse.", QMessageBox.Ok, QMessageBox.Ok)
+				return
+			if inputOk == False:
+				return
+			cmdParams.append(int(value))
+		item = CommandItem(0, commandType, cmdParams)
+		self.ui.listWidgetQueue.addItem(item)
+
+	def addDelayToQueue(self):
+		pass
+
+	def moveCommandUpQueue(self):
+		pass
+	
+	def moveCommandDownQueue(self):
+		pass
+
+	def deleteCommandFromQueue(self):
+		commandItem = self.ui.listWidgetQueue.currentItem()
+		if commandItem is None:
+			return
+		confirmation = QMessageBox.Yes
+		# skip confirm for delays
+		if commandItem.delay == 0:
+			confirmation = QMessageBox.question(self, "BTSerial - Confirm delete", "Confirm deleting command from queue", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+		if confirmation == QMessageBox.Yes:
+			print("delete confirmed\n")
+			self.ui.listWidgetQueue.takeItem(self.ui.listWidgetQueue.row(commandItem))
+		else:
+			print("delete canceled\n")
+
+
+	def executeCommands(self):
+		pass
 
 	def closeEvent(self, event):
 		event.ignore()
