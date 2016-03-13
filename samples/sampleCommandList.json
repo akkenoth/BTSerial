@@ -2,11 +2,11 @@
 	"commands": [
 		{
 			"name": "command1",
-			"code": "CMD1%B:%B",
+			"code": "CMD1%1%1",
 			"description": "command 1 description"
 		}, {
 			"name": "command2",
-			"code": "CMD2%I:%B",
+			"code": "CMD2%1%2",
 			"description": "command 2 description"
 		}
 	]
