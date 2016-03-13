@@ -307,17 +307,26 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad">
    <property name="text">
-    <string>Load</string>
+    <string>Load queue</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>Save queue</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionLoadList">
    <property name="text">
     <string>Load list</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+L</string>
    </property>
   </action>
   <action name="actionConnect">
@@ -349,6 +358,9 @@
   <action name="actionSaveList">
    <property name="text">
     <string>Save list</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>

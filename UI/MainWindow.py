@@ -222,15 +222,19 @@ class Ui_BTSerialMainWindow(object):
         self.listWidgetLog.setSortingEnabled(__sortingEnabled)
         self.menuProgram.setTitle(_translate("BTSerialMainWindow", "Program"))
         self.menuCommands.setTitle(_translate("BTSerialMainWindow", "Commands"))
-        self.actionLoad.setText(_translate("BTSerialMainWindow", "Load"))
-        self.actionSave.setText(_translate("BTSerialMainWindow", "Save"))
+        self.actionLoad.setText(_translate("BTSerialMainWindow", "Load queue"))
+        self.actionLoad.setShortcut(_translate("BTSerialMainWindow", "Ctrl+L"))
+        self.actionSave.setText(_translate("BTSerialMainWindow", "Save queue"))
+        self.actionSave.setShortcut(_translate("BTSerialMainWindow", "Ctrl+S"))
         self.actionLoadList.setText(_translate("BTSerialMainWindow", "Load list"))
+        self.actionLoadList.setShortcut(_translate("BTSerialMainWindow", "Ctrl+Shift+L"))
         self.actionConnect.setText(_translate("BTSerialMainWindow", "Connect"))
         self.actionDisconnect.setText(_translate("BTSerialMainWindow", "Disconnect"))
         self.actionQuit.setText(_translate("BTSerialMainWindow", "Quit"))
         self.actionQuit.setShortcut(_translate("BTSerialMainWindow", "Ctrl+Q"))
         self.actionSettings.setText(_translate("BTSerialMainWindow", "Settings"))
         self.actionSaveList.setText(_translate("BTSerialMainWindow", "Save list"))
+        self.actionSaveList.setShortcut(_translate("BTSerialMainWindow", "Ctrl+Shift+S"))
 
 
 if __name__ == "__main__":
