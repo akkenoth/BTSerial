@@ -41,34 +41,6 @@
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
-        <item>
-         <property name="text">
-          <string notr="true">Polecenie 1</string>
-         </property>
-         <property name="toolTip">
-          <string notr="true"/>
-         </property>
-         <property name="statusTip">
-          <string notr="true"/>
-         </property>
-         <property name="whatsThis">
-          <string notr="true"/>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string notr="true">Polecenie 2</string>
-         </property>
-         <property name="toolTip">
-          <string notr="true"/>
-         </property>
-         <property name="statusTip">
-          <string notr="true"/>
-         </property>
-         <property name="whatsThis">
-          <string notr="true"/>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -127,23 +99,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidgetQueue">
-        <item>
-         <property name="text">
-          <string>Polecenie 1: parametr a</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Polecenie 1: parametr x</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Polecenie 2: parametr w</string>
-         </property>
-        </item>
-       </widget>
+       <widget class="QListWidget" name="listWidgetQueue"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
