@@ -8,14 +8,20 @@ if [[ $# < 2 ]]; then
 fi
 
 PYUIC='pyuic5'
+WIN=false
 if [[ $1 == '-w' ]]; then
 	PYUIC='/c/Python34/Lib/site-packages/PyQt5/pyuic5.bat'
+	WIN=true
 	shift
 fi
 
 while [[ $# > 0 ]]; do
 	echo -n "Parsing ${1}... "
-	$PYUIC -x "${1}" -o "${1%%.ui}.py"
+	$PYUIC -i 0 -x "${1}" -o "${1%%.ui}.py"
+	if [[ "$WIN" == true ]]; then
+		echo -n "Converting... "
+		dos2unix -q "${1%%.ui}.py"
+	fi
 	echo "Done!"
 	shift
 done
