@@ -1,7 +1,6 @@
-import sys
 import json
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog
 
 from UI.MainWindow import Ui_BTSerialMainWindow
 from Commands.CommandItem import CommandItem
@@ -19,15 +18,37 @@ class BTSerial(QMainWindow):
 
 	def setupUIActions(self):
 		self.ui.pushButtonAddToQueue.clicked.connect(self.addCommandToQueue)
+		self.ui.listWidgetCommands.setSortingEnabled(True)
+		self.ui.listWidgetCommands.itemDoubleClicked.connect(self.addCommandToQueue)
 		self.ui.actionQuit.triggered.connect(self.closeConfirmation)
 		self.ui.actionLoadList.triggered.connect(self.loadCommandList)
 
-	def addCommandToQueue(self):
-		command = self.ui.listWidgetCommands.currentItem()
-		if command is None:
+	def addCommandToQueue(self, commandType):
+		if commandType is None:
+			commandType = self.ui.listWidgetCommands.currentItem()
+		if commandType is None:
 			return
-		commandTxt = command.text()
-		self.ui.listWidgetQueue.addItem(commandTxt)
+		cmdParams = []
+		code = commandType.code
+		inputOk = True
+		for i in range(len(code)):
+			if code[i] is not '%':
+				continue
+			# Unsafe!
+			if code[i+1] == '1':
+				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
+				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 255)
+			elif code[i+1] == '2':
+				label = "Enter value for parameter " + str(cmdParams.__len__() + 1)
+				value, inputOk = QInputDialog.getInt(self, "BTSerial - enter parameter value", label, min = 0, max = 65535)
+			else:
+				QMessageBox.warning(self, "BTSerial - Error", "Invalid command code, cannot parse.", QMessageBox.Ok, QMessageBox.Ok)
+				return
+			if inputOk == False:
+				return
+			cmdParams.append(int(value))
+		item = CommandItem(0, commandType, cmdParams)
+		self.ui.listWidgetQueue.addItem(item)
 
 	def loadCommandList(self):
 		# Add confirmation if there are commands on the list
@@ -55,6 +76,7 @@ class BTSerial(QMainWindow):
 				QMessageBox.warning(self, "BTSerial - Error", "Invalid command structure.", QMessageBox.Ok, QMessageBox.Ok)
 				print("invalid command structure")
 				return
+			# TODO: add code validation in CommandType ctor and try/expect here
 			command = CommandType(c["name"], c["code"], c["description"])
 			commandTypeList.append(command)
 
