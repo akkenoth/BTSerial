@@ -4,6 +4,8 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
 
 from UI.MainWindow import Ui_BTSerialMainWindow
+from Commands.CommandItem import CommandItem
+from Commands.CommandType import CommandType
 
 from pprint import pprint
 
@@ -38,15 +40,27 @@ class BTSerial(QMainWindow):
 			with open(filename[0], 'r') as data_raw:
 				data = json.load(data_raw)
 		except IOError:
-			print("error reading file: " + filename[0])
+			QMessageBox.warning(self, "BTSerial - Error", "Error reading file: " + filename[0], QMessageBox.Ok, QMessageBox.Ok)
 			return
 		except JSONDecodeError as error:
-			print("error parsing file: " + e.msg)
+			QMessageBox.warning(self, "BTSerial - Error", "Error parsing file: " + e.msg, QMessageBox.Ok, QMessageBox.Ok)
+			return
+		if not isinstance(data["commands"], list):
+			QMessageBox.warning(self, "BTSerial - Error", "\"commands\" object is not an array.", QMessageBox.Ok, QMessageBox.Ok)
 			return
 
-		pprint(data)
-		sys.stdout.flush()
+		commandTypeList = []
+		for c in data["commands"]:
+			if not (isinstance(c["name"], str) and isinstance(c["code"], str) and isinstance(c["description"], str)):
+				QMessageBox.warning(self, "BTSerial - Error", "Invalid command structure.", QMessageBox.Ok, QMessageBox.Ok)
+				print("invalid command structure")
+				return
+			command = CommandType(c["name"], c["code"], c["description"])
+			commandTypeList.append(command)
 
+		self.ui.listWidgetCommands.clear()
+		for c in commandTypeList:
+			self.ui.listWidgetCommands.addItem(c)
 
 	def closeEvent(self, event):
 		event.ignore()
