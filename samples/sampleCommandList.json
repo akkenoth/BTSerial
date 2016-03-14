@@ -1,13 +1,21 @@
 {
-	"commands": [
-		{
-			"name": "command1",
-			"code": "CMD1%1%1",
-			"description": "command 1 description"
-		}, {
-			"name": "command2",
-			"code": "CMD2%1%2",
-			"description": "command 2 description"
-		}
-	]
+	"commands": [{
+		"name": "command1",
+		"code": "CMD1%1%1",
+		"description": "command 1 description"
+	}, {
+		"name": "command2",
+		"code": "CMD2%1%2",
+		"description": "command 2 description"
+	}, {
+		"name": "command3",
+		"textType": false,
+		"code": [
+			"0x45",
+			"0x46",
+			"0x47",
+			"%1"
+		],
+		"description": "command 2 description"
+	}]
 }
