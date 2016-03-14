@@ -9,14 +9,14 @@ class CommandItem(QListWidgetItem):
 	description = None
 	text = None
 
-	def __init__(self, delay, commandType, cmdParams = []):
+	def __init__(self, delay = 0, commandType = None, cmdParams = []):
 		if (not isinstance(delay, int)) or (delay < 0):
 			raise TypeError("CommandItem: delay must be a positive integer.")
 		self.delay = delay
 		if commandType is None:
-			self.text = "Delay (" + self.delay + ")"
+			self.text = "Delay (" + str(self.delay) + ")"
 			self.code = "DELAY"
-			self.description = "Delay of " + self.delay + " milliseconds"
+			self.description = "Delay of " + str(self.delay) + " milliseconds"
 		else:
 			if not isinstance(commandType, CommandType):
 				raise TypeError("CommandItem: commandType should be an instance of CommandType class.")
