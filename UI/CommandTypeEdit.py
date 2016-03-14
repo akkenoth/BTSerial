@@ -1,14 +1,16 @@
 from PyQt5.QtWidgets import QDialog, QInputDialog
-from Layouts.NewCommandWidget import Ui_BTSerialNewCommandDialog
+from Commands.CommandType import CommandType
+from Layouts.CommandTypeEditWidget import Ui_BTSerialCommandTypeEditDialog
 
-class NewCommand(QDialog):
+class CommandTypeEdit(QDialog):
 	textBased = True
 
-	def __init__(self, parent = None):
+	def __init__(self, parent = None, name = None, code = None, description = None):
 		QDialog.__init__(self, parent)
-		self.ui = Ui_BTSerialNewCommandDialog()
+		self.ui = Ui_BTSerialCommandTypeEditDialog()
 		self.ui.setupUi(self)
 		self.setupUIActions()
+		self.applyValues(name, code, description)
 
 	def setupUIActions(self):
 		self.ui.radioButtonText.toggled.connect(self.commandTypeToggled)
@@ -20,6 +22,22 @@ class NewCommand(QDialog):
 
 		self.ui.groupBoxCommandBytes.setVisible(False)
 		self.adjustSize()
+
+	def applyValues(self, name, code, description):
+		if name is not None:
+			self.ui.lineEditName.setText(str(name))
+		if description is not None:
+			self.ui.lineEditDescription.setText(str(description))
+		if code is not None:
+			if type(code) is not bytes:
+				self.ui.lineEditCodeString.setText(str(code))
+			else:
+				self.ui.radioButtonText.toggle()
+				for i in range(len(code)):
+					if code[i] == '%':
+						self.ui.listWidgetBytes.addItem("%" + str(code[i+1]))
+					elif (i == 0) or (code[i-1] != '%'):
+						self.ui.listWidgetBytes.addItem(str(code[i]))
 
 	def commandTypeToggled(self, textBased = True):
 		self.ui.lineEditCodeString.setVisible(textBased)
@@ -36,7 +54,7 @@ class NewCommand(QDialog):
 
 	def addItemParam(self):
 		inputOk = True
-		paramLen, inputOk = QInputDialog.getInt(self, "BTSerial - enter byte value", "Enter param length in bytes (0 - 4).", min = 0, max = 4)
+		paramLen, inputOk = QInputDialog.getInt(self, "BTSerial - enter byte value", "Enter param length in bytes (1 - 4).", min = 1, max = 4)
 		if inputOk == False:
 			return
 		self.ui.listWidgetBytes.addItem("%" + str(paramLen))
@@ -64,3 +82,36 @@ class NewCommand(QDialog):
 		if row == -1:
 			return
 		self.ui.listWidgetBytes.takeItem(row)
+
+	def getName(self):
+		return self.ui.lineEditName.text()
+
+	def getDescription(self):
+		return self.ui.lineEditDescription.text()
+
+	def getIsTextType(self):
+		return self.ui.radioButtonText.isChecked()
+
+	def getCode(self):
+		if(self.getIsTextType()):
+			return self.ui.lineEditCodeString.text()
+		else:
+			code = ""
+			for i in range(self.ui.listWidgetBytes.count()):
+				itemText = self.ui.listWidgetBytes.item(i).text()
+				if itemText[0] == '%':
+					code += itemText
+				else:
+					code += chr(int(itemText))
+			return code
+
+	@staticmethod
+	def getCommandType(self, parent = None, name = None, code = None, description = None):
+		newCommandDialog = CommandTypeEdit(parent, name, code, description)
+		accepted = newCommandDialog.exec_()
+		if accepted == QDialog.Rejected:
+			return (None, False)
+		name = newCommandDialog.getName()
+		code = newCommandDialog.getCode()
+		description = newCommandDialog.getDescription()
+		return (CommandType(name, code, description), True)
