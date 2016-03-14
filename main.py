@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from BTSerial import BTSerial
+from UI.BTSerial import BTSerial
 
 def main():
 	app = QApplication(sys.argv)

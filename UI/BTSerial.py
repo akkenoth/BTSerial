@@ -2,11 +2,10 @@ import json
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog
 
-from UI.MainWindow import Ui_BTSerialMainWindow
 from Commands.CommandItem import CommandItem
 from Commands.CommandType import CommandType
-
-from pprint import pprint
+from UI.NewCommand import NewCommand
+from Layouts.MainWindow import Ui_BTSerialMainWindow
 
 class BTSerial(QMainWindow):
 	ui = None
@@ -91,7 +90,8 @@ class BTSerial(QMainWindow):
 		pass
 
 	def createNewCommand(self):
-		pass
+		newCommandDialog = NewCommand(self)
+		newCommandDialog.show()
 
 	def addCommandToQueueButtonWrapper(self):
 		self.addCommandToQueue(self.ui.listWidgetCommands.currentItem())
@@ -122,12 +122,17 @@ class BTSerial(QMainWindow):
 		self.ui.listWidgetQueue.addItem(item)
 
 	def addDelayToQueue(self):
-		pass
+		inputOk = True
+		delay, inputOk = QInputDialog.getInt(self, "BTSerial - enter delay value", "Enter delay length (in milliseconds).", min = 0, max = 10000)
+		if inputOk == False:
+			return
+		item = CommandItem(delay)
+		self.ui.listWidgetQueue.addItem(item)
 
 	def moveCommandUpQueue(self):
 		count = self.ui.listWidgetQueue.count()
 		row = self.ui.listWidgetQueue.currentRow()
-		if (count <= 1) or (row == 0):
+		if (count <= 1) or (row <= 0):
 			return
 		commandItem = self.ui.listWidgetQueue.takeItem(row)
 		self.ui.listWidgetQueue.insertItem(row - 1, commandItem)
@@ -136,22 +141,22 @@ class BTSerial(QMainWindow):
 	def moveCommandDownQueue(self):
 		count = self.ui.listWidgetQueue.count()
 		row = self.ui.listWidgetQueue.currentRow()
-		if (count <= 1) or (row == count - 1):
+		if (count <= 1) or (row == count - 1) or (row < 0):
 			return
 		commandItem = self.ui.listWidgetQueue.takeItem(row)
 		self.ui.listWidgetQueue.insertItem(row + 1, commandItem)
 		self.ui.listWidgetQueue.setCurrentRow(row + 1)
 
 	def deleteCommandFromQueue(self):
-		commandItem = self.ui.listWidgetQueue.currentItem()
-		if commandItem is None:
+		row = self.ui.listWidgetQueue.currentRow()
+		if row == -1:
 			return
 		confirmation = QMessageBox.Yes
 		# skip confirm for delays
 		if commandItem.delay == 0:
 			confirmation = QMessageBox.question(self, "BTSerial - Confirm delete", "Confirm deleting command from queue", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
 		if confirmation == QMessageBox.Yes:
-			self.ui.listWidgetQueue.takeItem(self.ui.listWidgetQueue.row(commandItem))
+			self.ui.listWidgetQueue.takeItem(row)
 
 	def executeCommands(self):
 		pass
