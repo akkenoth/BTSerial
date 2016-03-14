@@ -2,7 +2,7 @@
 # Generate .py files from Qt Designer's .ui files.
 # -w for Windows mode.
 
-if [[ $# < 2 ]]; then
+if [[ $# < 1 ]]; then
 	echo "No arguments provided."
 	exit 1
 fi
@@ -13,6 +13,11 @@ if [[ $1 == '-w' ]]; then
 	PYUIC='/c/Python34/Lib/site-packages/PyQt5/pyuic5.bat'
 	WIN=true
 	shift
+fi
+
+if [[ $# < 1 ]]; then
+	echo "No arguments provided."
+	exit 1
 fi
 
 while [[ $# > 0 ]]; do
