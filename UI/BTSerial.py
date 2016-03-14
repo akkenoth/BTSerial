@@ -1,10 +1,14 @@
 import json
+import sys
+
+import pprint
+
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog
 
 from Commands.CommandItem import CommandItem
 from Commands.CommandType import CommandType
-from UI.NewCommand import NewCommand
+from UI.CommandTypeEdit import CommandTypeEdit
 from Layouts.MainWindow import Ui_BTSerialMainWindow
 
 class BTSerial(QMainWindow):
@@ -18,21 +22,26 @@ class BTSerial(QMainWindow):
 	def setupUIActions(self):
 		self.ui.actionConnect.triggered.connect(self.connectToDevice)
 		self.ui.actionDisconnect.triggered.connect(self.disconnectFromDevice)
-		self.ui.actionLoad.triggered.connect(self.loadCommandQueue)
-		self.ui.actionLoadList.triggered.connect(self.loadCommandList)
+		self.ui.actionLoadQueue.triggered.connect(self.loadCommandQueue)
+		self.ui.actionLoadTypes.triggered.connect(self.loadCommandList)
 		self.ui.actionQuit.triggered.connect(self.closeConfirmation)
-		self.ui.actionSave.triggered.connect(self.saveCommandQueue)
-		self.ui.actionSaveList.triggered.connect(self.saveCommandList)
+		self.ui.actionSaveQueue.triggered.connect(self.saveCommandQueue)
+		self.ui.actionSaveTypes.triggered.connect(self.saveCommandList)
 		self.ui.actionSettings.triggered.connect(self.openSettings)
-		self.ui.listWidgetCommands.itemDoubleClicked.connect(self.addCommandToQueue)
+		self.ui.listWidgetCommands.itemDoubleClicked.connect(self.createCommandItem)
 		self.ui.listWidgetCommands.setSortingEnabled(True)
-		self.ui.pushButtonAddCommand.clicked.connect(self.createNewCommand)
+		self.ui.pushButtonAddCommandType.clicked.connect(self.createCommandType)
 		self.ui.pushButtonAddDelay.clicked.connect(self.addDelayToQueue)
-		self.ui.pushButtonAddToQueue.clicked.connect(self.addCommandToQueueButtonWrapper)
-		self.ui.pushButtonDeleteCommand.clicked.connect(self.deleteCommandFromQueue)
+		self.ui.pushButtonAddToQueue.clicked.connect(self.createCommandItemButtonWrapper)
+		self.ui.pushButtonDeleteCommandItem.clicked.connect(self.deleteCommandItem)
+		self.ui.pushButtonDeleteCommandType.clicked.connect(self.deleteCommandType)
+		self.ui.pushButtonEditCommandItem.clicked.connect(self.editCommandItem)
+		self.ui.pushButtonEditCommandType.clicked.connect(self.editCommandType)
 		self.ui.pushButtonExecute.clicked.connect(self.executeCommands)
-		self.ui.pushButtonMoveCommandDown.clicked.connect(self.moveCommandDownQueue)
-		self.ui.pushButtonMoveCommandUp.clicked.connect(self.moveCommandUpQueue)
+		self.ui.pushButtonMoveCommandItemDown.clicked.connect(self.moveCommandDownQueue)
+		self.ui.pushButtonMoveCommandItemUp.clicked.connect(self.moveCommandUpQueue)
+
+	### Program menu ###
 
 	def connectToDevice(self):
 		pass
@@ -45,6 +54,8 @@ class BTSerial(QMainWindow):
 
 	def applySettings(self):
 		pass
+
+	### Commands menu ###
 
 	def loadCommandList(self):
 		# Add confirmation if there are commands on the list
@@ -67,14 +78,37 @@ class BTSerial(QMainWindow):
 			return
 
 		commandTypeList = []
+		invalidStructure = False
 		for c in data["commands"]:
-			if not (isinstance(c["name"], str) and isinstance(c["code"], str) and isinstance(c["description"], str)):
-				QMessageBox.warning(self, "BTSerial - Error", "Invalid command structure.", QMessageBox.Ok, QMessageBox.Ok)
-				print("invalid command structure")
-				return
-			# TODO: add code validation in CommandType ctor and try/expect here
-			command = CommandType(c["name"], c["code"], c["description"])
+			if not(("name" in c) and ("code" in c) and (type(c["name"]) is str)):
+				invalidStructure = True
+				break
+			name = str(c["name"])
+			description = ""
+			if ("description" in c) and (type(c["description"]) is str):
+				description = str(c["description"])
+			textType = True
+			if ("textType" in c) and (type(c["textType"]) is bool):
+				textType = bool(c["textType"])
+			if (textType and not (type(c["code"]) is str)) or ((not textType) and not (type(c["code"]) is list)):
+				invalidStructure = True
+				break
+
+			try:
+				command = CommandType(name, c["code"], description, textType)
+			except:
+				e = sys.exc_info()[0]
+				pprint.pprint(c["code"])
+				sys.stdout.flush()
+				print("error: " + str(e))
+				sys.stdout.flush()
+				invalidStructure = True
+				break
 			commandTypeList.append(command)
+
+		if invalidStructure is True:
+			QMessageBox.warning(self, "BTSerial - Error", "Invalid command structure.", QMessageBox.Ok, QMessageBox.Ok)
+			return
 
 		self.ui.listWidgetCommands.clear()
 		for c in commandTypeList:
@@ -89,14 +123,26 @@ class BTSerial(QMainWindow):
 	def saveCommandQueue(self):
 		pass
 
-	def createNewCommand(self):
-		newCommandDialog = NewCommand(self)
-		newCommandDialog.show()
+	### Command types actions ###
 
-	def addCommandToQueueButtonWrapper(self):
-		self.addCommandToQueue(self.ui.listWidgetCommands.currentItem())
+	def createCommandType(self):
+		commandType, inputOk = CommandTypeEdit.getCommandType(self)
+		if inputOk == False:
+			return
+		self.ui.listWidgetCommands.addItem(commandType)
 
-	def addCommandToQueue(self, commandType):
+	def editCommandType(self):
+		pass
+
+	def deleteCommandType(self):
+		pass
+
+	### Command item creation ###
+
+	def createCommandItemButtonWrapper(self):
+		self.createCommandItem(self.ui.listWidgetCommands.currentItem())
+
+	def createCommandItem(self, commandType):
 		if commandType is None:
 			return
 		cmdParams = []
@@ -129,6 +175,8 @@ class BTSerial(QMainWindow):
 		item = CommandItem(delay)
 		self.ui.listWidgetQueue.addItem(item)
 
+	### Command item actions ###
+
 	def moveCommandUpQueue(self):
 		count = self.ui.listWidgetQueue.count()
 		row = self.ui.listWidgetQueue.currentRow()
@@ -137,7 +185,7 @@ class BTSerial(QMainWindow):
 		commandItem = self.ui.listWidgetQueue.takeItem(row)
 		self.ui.listWidgetQueue.insertItem(row - 1, commandItem)
 		self.ui.listWidgetQueue.setCurrentRow(row - 1)
-	
+
 	def moveCommandDownQueue(self):
 		count = self.ui.listWidgetQueue.count()
 		row = self.ui.listWidgetQueue.currentRow()
@@ -147,25 +195,34 @@ class BTSerial(QMainWindow):
 		self.ui.listWidgetQueue.insertItem(row + 1, commandItem)
 		self.ui.listWidgetQueue.setCurrentRow(row + 1)
 
-	def deleteCommandFromQueue(self):
+	def editCommandItem(self):
+		pass
+
+	def deleteCommandItem(self):
 		row = self.ui.listWidgetQueue.currentRow()
 		if row == -1:
 			return
 		confirmation = QMessageBox.Yes
 		# skip confirm for delays
-		if commandItem.delay == 0:
-			confirmation = QMessageBox.question(self, "BTSerial - Confirm delete", "Confirm deleting command from queue", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+		if self.ui.listWidgetQueue.item(row).delay == 0:
+			confirmation = QMessageBox.question(self, "BTSerial - Confirm delete", "Confirm deleting command from queue",
+				QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
 		if confirmation == QMessageBox.Yes:
 			self.ui.listWidgetQueue.takeItem(row)
 
+	### Execute actions ###
+
 	def executeCommands(self):
 		pass
+
+	### Special handlers ###
 
 	def closeEvent(self, event):
 		event.ignore()
 		self.closeConfirmation()
 
 	def closeConfirmation(self):
-		confirmation = QMessageBox.question(self, "BTSerial - Quit?", "Are you sure you want to quit?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+		confirmation = QMessageBox.question(self, "BTSerial - Quit?", "Are you sure you want to quit?",
+			QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 		if confirmation == QMessageBox.Yes:
 			QCoreApplication.instance().quit()
