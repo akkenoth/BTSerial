@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'NewCommandWidget.ui'
+# Form implementation generated from reading ui file 'CommandTypeEditWidget.ui'
 #
 # Created by: PyQt5 UI code generator 5.5.1
 #
@@ -8,15 +8,15 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_BTSerialNewCommandDialog(object):
-	def setupUi(self, BTSerialNewCommandDialog):
-		BTSerialNewCommandDialog.setObjectName("BTSerialNewCommandDialog")
-		BTSerialNewCommandDialog.resize(300, 322)
-		BTSerialNewCommandDialog.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
-		BTSerialNewCommandDialog.setSizeGripEnabled(True)
-		self.verticalLayout_2 = QtWidgets.QVBoxLayout(BTSerialNewCommandDialog)
+class Ui_BTSerialCommandTypeEditDialog(object):
+	def setupUi(self, BTSerialCommandTypeEditDialog):
+		BTSerialCommandTypeEditDialog.setObjectName("BTSerialCommandTypeEditDialog")
+		BTSerialCommandTypeEditDialog.resize(300, 369)
+		BTSerialCommandTypeEditDialog.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
+		BTSerialCommandTypeEditDialog.setSizeGripEnabled(True)
+		self.verticalLayout_2 = QtWidgets.QVBoxLayout(BTSerialCommandTypeEditDialog)
 		self.verticalLayout_2.setObjectName("verticalLayout_2")
-		self.lineEditName = QtWidgets.QLineEdit(BTSerialNewCommandDialog)
+		self.lineEditName = QtWidgets.QLineEdit(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -31,7 +31,7 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.lineEditName.setClearButtonEnabled(False)
 		self.lineEditName.setObjectName("lineEditName")
 		self.verticalLayout_2.addWidget(self.lineEditName)
-		self.lineEditDescription = QtWidgets.QLineEdit(BTSerialNewCommandDialog)
+		self.lineEditDescription = QtWidgets.QLineEdit(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -41,7 +41,7 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.lineEditDescription.setMaxLength(255)
 		self.lineEditDescription.setObjectName("lineEditDescription")
 		self.verticalLayout_2.addWidget(self.lineEditDescription)
-		self.groupBoxCommandType = QtWidgets.QGroupBox(BTSerialNewCommandDialog)
+		self.groupBoxCommandType = QtWidgets.QGroupBox(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -66,7 +66,7 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.radioButtonByte.raise_()
 		self.radioButtonText.raise_()
 		self.verticalLayout_2.addWidget(self.groupBoxCommandType)
-		self.lineEditCodeString = QtWidgets.QLineEdit(BTSerialNewCommandDialog)
+		self.lineEditCodeString = QtWidgets.QLineEdit(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -74,7 +74,7 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.lineEditCodeString.setSizePolicy(sizePolicy)
 		self.lineEditCodeString.setObjectName("lineEditCodeString")
 		self.verticalLayout_2.addWidget(self.lineEditCodeString)
-		self.groupBoxCommandBytes = QtWidgets.QGroupBox(BTSerialNewCommandDialog)
+		self.groupBoxCommandBytes = QtWidgets.QGroupBox(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -154,7 +154,7 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.verticalLayout.addWidget(self.toolButtonRemove)
 		self.horizontalLayout_3.addLayout(self.verticalLayout)
 		self.verticalLayout_2.addWidget(self.groupBoxCommandBytes)
-		self.buttonBox = QtWidgets.QDialogButtonBox(BTSerialNewCommandDialog)
+		self.buttonBox = QtWidgets.QDialogButtonBox(BTSerialCommandTypeEditDialog)
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 		sizePolicy.setHorizontalStretch(0)
 		sizePolicy.setVerticalStretch(0)
@@ -171,33 +171,33 @@ class Ui_BTSerialNewCommandDialog(object):
 		self.lineEditDescription.raise_()
 		self.groupBoxCommandBytes.raise_()
 
-		self.retranslateUi(BTSerialNewCommandDialog)
-		self.buttonBox.accepted.connect(BTSerialNewCommandDialog.accept)
-		self.buttonBox.rejected.connect(BTSerialNewCommandDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(BTSerialNewCommandDialog)
+		self.retranslateUi(BTSerialCommandTypeEditDialog)
+		self.buttonBox.accepted.connect(BTSerialCommandTypeEditDialog.accept)
+		self.buttonBox.rejected.connect(BTSerialCommandTypeEditDialog.reject)
+		QtCore.QMetaObject.connectSlotsByName(BTSerialCommandTypeEditDialog)
 
-	def retranslateUi(self, BTSerialNewCommandDialog):
+	def retranslateUi(self, BTSerialCommandTypeEditDialog):
 		_translate = QtCore.QCoreApplication.translate
-		BTSerialNewCommandDialog.setWindowTitle(_translate("BTSerialNewCommandDialog", "Dialog"))
-		self.lineEditName.setPlaceholderText(_translate("BTSerialNewCommandDialog", "Command name"))
-		self.lineEditDescription.setPlaceholderText(_translate("BTSerialNewCommandDialog", "Command description"))
-		self.groupBoxCommandType.setTitle(_translate("BTSerialNewCommandDialog", "Command code type"))
-		self.radioButtonText.setText(_translate("BTSerialNewCommandDialog", "Text-based"))
-		self.radioButtonByte.setText(_translate("BTSerialNewCommandDialog", "Byte-based"))
-		self.lineEditCodeString.setPlaceholderText(_translate("BTSerialNewCommandDialog", "Command code"))
-		self.toolButtonAddByte.setText(_translate("BTSerialNewCommandDialog", "Add byte"))
-		self.toolButtonAddParam.setText(_translate("BTSerialNewCommandDialog", "Add parameter"))
-		self.toolButtonMoveUp.setText(_translate("BTSerialNewCommandDialog", "Move up"))
-		self.toolButtonMoveDown.setText(_translate("BTSerialNewCommandDialog", "Move down"))
-		self.toolButtonRemove.setText(_translate("BTSerialNewCommandDialog", "Remove"))
+		BTSerialCommandTypeEditDialog.setWindowTitle(_translate("BTSerialCommandTypeEditDialog", "BTSerial - Command Type Edit"))
+		self.lineEditName.setPlaceholderText(_translate("BTSerialCommandTypeEditDialog", "Command name"))
+		self.lineEditDescription.setPlaceholderText(_translate("BTSerialCommandTypeEditDialog", "Command description"))
+		self.groupBoxCommandType.setTitle(_translate("BTSerialCommandTypeEditDialog", "Command code type"))
+		self.radioButtonText.setText(_translate("BTSerialCommandTypeEditDialog", "Text-based"))
+		self.radioButtonByte.setText(_translate("BTSerialCommandTypeEditDialog", "Byte-based"))
+		self.lineEditCodeString.setPlaceholderText(_translate("BTSerialCommandTypeEditDialog", "Command code"))
+		self.toolButtonAddByte.setText(_translate("BTSerialCommandTypeEditDialog", "Add byte"))
+		self.toolButtonAddParam.setText(_translate("BTSerialCommandTypeEditDialog", "Add parameter"))
+		self.toolButtonMoveUp.setText(_translate("BTSerialCommandTypeEditDialog", "Move up"))
+		self.toolButtonMoveDown.setText(_translate("BTSerialCommandTypeEditDialog", "Move down"))
+		self.toolButtonRemove.setText(_translate("BTSerialCommandTypeEditDialog", "Remove"))
 
 
 if __name__ == "__main__":
 	import sys
 	app = QtWidgets.QApplication(sys.argv)
-	BTSerialNewCommandDialog = QtWidgets.QDialog()
-	ui = Ui_BTSerialNewCommandDialog()
-	ui.setupUi(BTSerialNewCommandDialog)
-	BTSerialNewCommandDialog.show()
+	BTSerialCommandTypeEditDialog = QtWidgets.QDialog()
+	ui = Ui_BTSerialCommandTypeEditDialog()
+	ui.setupUi(BTSerialCommandTypeEditDialog)
+	BTSerialCommandTypeEditDialog.show()
 	sys.exit(app.exec_())
 

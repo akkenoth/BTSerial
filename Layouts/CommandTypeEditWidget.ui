@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BTSerialNewCommandDialog</class>
- <widget class="QDialog" name="BTSerialNewCommandDialog">
+ <class>BTSerialCommandTypeEditDialog</class>
+ <widget class="QDialog" name="BTSerialCommandTypeEditDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>322</height>
+    <height>369</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>BTSerial - Command Type Edit</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -315,7 +315,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>BTSerialNewCommandDialog</receiver>
+   <receiver>BTSerialCommandTypeEditDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -331,7 +331,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>BTSerialNewCommandDialog</receiver>
+   <receiver>BTSerialCommandTypeEditDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
