@@ -98,12 +98,9 @@ class BTSerial(QMainWindow):
 				command = CommandType(name, c["code"], description, textType)
 			except:
 				e = sys.exc_info()[0]
-				pprint.pprint(c["code"])
-				sys.stdout.flush()
-				print("error: " + str(e))
-				sys.stdout.flush()
 				invalidStructure = True
 				break
+
 			commandTypeList.append(command)
 
 		if invalidStructure is True:
@@ -132,7 +129,16 @@ class BTSerial(QMainWindow):
 		self.ui.listWidgetCommands.addItem(commandType)
 
 	def editCommandType(self):
-		pass
+		commandType = self.ui.listWidgetCommands.currentItem()
+		if commandType is None:
+			return
+
+		commandType, inputOk = CommandTypeEdit.getCommandType(self, commandType.name, commandType.code, commandType.description, commandType.textType)
+		if inputOk == False:
+			return
+		row = self.ui.listWidgetCommands.currentRow()
+		self.ui.listWidgetCommands.takeItem(row)
+		self.ui.listWidgetCommands.insertItem(commandType)
 
 	def deleteCommandType(self):
 		pass
