@@ -10,6 +10,7 @@ class CommandType(QListWidgetItem):
 		QListWidgetItem.__init__(self)
 		self.name = str(name)
 		self.description = str(description)
+		self.textType = bool(textType)
 
 		if (textType is True) or (type(code) is str):
 			self.code = str(code)
