@@ -3,14 +3,14 @@ from Commands.CommandType import CommandType
 from Layouts.CommandTypeEditWidget import Ui_BTSerialCommandTypeEditDialog
 
 class CommandTypeEdit(QDialog):
-	textBased = True
+	textType = True
 
-	def __init__(self, parent = None, name = None, code = None, description = None):
+	def __init__(self, parent = None, name = None, code = None, description = None, textType = True):
 		QDialog.__init__(self, parent)
 		self.ui = Ui_BTSerialCommandTypeEditDialog()
 		self.ui.setupUi(self)
 		self.setupUIActions()
-		self.applyValues(name, code, description)
+		self.applyValues(name, code, description, textType)
 
 	def setupUIActions(self):
 		self.ui.radioButtonText.toggled.connect(self.commandTypeToggled)
@@ -23,27 +23,29 @@ class CommandTypeEdit(QDialog):
 		self.ui.groupBoxCommandBytes.setVisible(False)
 		self.adjustSize()
 
-	def applyValues(self, name, code, description):
+	def applyValues(self, name, code, description, textType):
 		if name is not None:
 			self.ui.lineEditName.setText(str(name))
 		if description is not None:
 			self.ui.lineEditDescription.setText(str(description))
+		self.textType = bool(textType)
+		if not self.textType:
+			self.ui.radioButtonByte.toggle()
 		if code is not None:
-			if type(code) is not bytes:
+			if self.textType:
 				self.ui.lineEditCodeString.setText(str(code))
 			else:
-				self.ui.radioButtonText.toggle()
 				for i in range(len(code)):
 					if code[i] == '%':
 						self.ui.listWidgetBytes.addItem("%" + str(code[i+1]))
 					elif (i == 0) or (code[i-1] != '%'):
 						self.ui.listWidgetBytes.addItem(str(code[i]))
 
-	def commandTypeToggled(self, textBased = True):
-		self.ui.lineEditCodeString.setVisible(textBased)
-		self.ui.groupBoxCommandBytes.setVisible(not textBased)
+	def commandTypeToggled(self, textType = True):
+		self.ui.lineEditCodeString.setVisible(textType)
+		self.ui.groupBoxCommandBytes.setVisible(not textType)
 		self.adjustSize()
-		self.textBased = textBased
+		self.textType = textType
 
 	def addItemByte(self):
 		inputOk = True
@@ -89,11 +91,11 @@ class CommandTypeEdit(QDialog):
 	def getDescription(self):
 		return self.ui.lineEditDescription.text()
 
-	def getIsTextType(self):
+	def getIstextType(self):
 		return self.ui.radioButtonText.isChecked()
 
 	def getCode(self):
-		if(self.getIsTextType()):
+		if(self.getIstextType()):
 			return self.ui.lineEditCodeString.text()
 		else:
 			code = ""
@@ -106,8 +108,8 @@ class CommandTypeEdit(QDialog):
 			return code
 
 	@staticmethod
-	def getCommandType(self, parent = None, name = None, code = None, description = None):
-		newCommandDialog = CommandTypeEdit(parent, name, code, description)
+	def getCommandType(parent = None, name = None, code = None, description = None, textType = True):
+		newCommandDialog = CommandTypeEdit(parent, name, code, description, textType)
 		accepted = newCommandDialog.exec_()
 		if accepted == QDialog.Rejected:
 			return (None, False)
