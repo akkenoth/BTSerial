@@ -136,13 +136,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonEditCommandItem">
-          <property name="text">
-           <string>Edit...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pushButtonDeleteCommandItem">
           <property name="text">
            <string>Delete</string>
@@ -194,60 +187,119 @@
       </item>
       <item>
        <widget class="QListWidget" name="listWidgetLog">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="dragEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::DragOnly</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
+        <property name="selectionRectVisible">
+         <bool>true</bool>
+        </property>
         <item>
          <property name="text">
-          <string notr="true">&lt;&lt;&lt; Coś z robota 1</string>
+          <string notr="true">&lt;&lt;&lt; Incoming message</string>
          </property>
          <property name="font">
           <font>
+           <family>Monospace</family>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
+         <property name="foreground">
+          <brush brushstyle="NoBrush">
+           <color alpha="255">
+            <red>0</red>
+            <green>0</green>
+            <blue>127</blue>
+           </color>
+          </brush>
+         </property>
         </item>
         <item>
          <property name="text">
-          <string notr="true">&lt;&lt;&lt; Coś z robota 2</string>
+          <string notr="true">--- Informational message</string>
          </property>
          <property name="font">
           <font>
+           <family>Monospace</family>
+           <italic>false</italic>
+          </font>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string notr="true">&gt;&gt;&gt; Outcoming command</string>
+         </property>
+         <property name="font">
+          <font>
+           <family>Monospace</family>
            <weight>75</weight>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string notr="true">&gt;&gt;&gt; Polecenie 1</string>
-         </property>
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string notr="true">&gt;&gt;&gt; Polecenie 2</string>
-         </property>
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string notr="true">&lt;&lt;&lt; Coś z robota 3</string>
-         </property>
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
+         <property name="foreground">
+          <brush brushstyle="NoBrush">
+           <color alpha="255">
+            <red>0</red>
+            <green>85</green>
+            <blue>0</blue>
+           </color>
+          </brush>
          </property>
         </item>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayoutLogFilters">
+        <item>
+         <widget class="QCheckBox" name="checkBoxIncomingFilter">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
+          </property>
+          <property name="text">
+           <string>Incoming</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxOutgoingFilter">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
+          </property>
+          <property name="text">
+           <string>Outgoing</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxLogFilter">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
+          </property>
+          <property name="text">
+           <string>Log</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
