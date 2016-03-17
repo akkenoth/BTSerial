@@ -1,23 +1,26 @@
-import json
 import sys
-
-import pprint
+import json
 
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QInputDialog, QListWidgetItem
 
 from Commands.CommandItem import CommandItem
 from Commands.CommandType import CommandType
+from Commands.BluetoothWorker import BluetoothWorker
 from UI.CommandTypeEdit import CommandTypeEdit
+from UI.LogItem import LogItem
 from Layouts.MainWindow import Ui_BTSerialMainWindow
 
 class BTSerial(QMainWindow):
 	ui = None
+	bluetoothWorker = None
+
 	def __init__(self):
 		QMainWindow.__init__(self)
 		self.ui = Ui_BTSerialMainWindow()
 		self.ui.setupUi(self)
 		self.setupUIActions()
+		self.setupBluetoothWorker()
 
 	def setupUIActions(self):
 		self.ui.actionConnect.triggered.connect(self.connectToDevice)
@@ -35,16 +38,24 @@ class BTSerial(QMainWindow):
 		self.ui.pushButtonAddToQueue.clicked.connect(self.createCommandItemButtonWrapper)
 		self.ui.pushButtonDeleteCommandItem.clicked.connect(self.deleteCommandItem)
 		self.ui.pushButtonDeleteCommandType.clicked.connect(self.deleteCommandType)
-		self.ui.pushButtonEditCommandItem.clicked.connect(self.editCommandItem)
 		self.ui.pushButtonEditCommandType.clicked.connect(self.editCommandType)
 		self.ui.pushButtonExecute.clicked.connect(self.executeCommands)
 		self.ui.pushButtonMoveCommandItemDown.clicked.connect(self.moveCommandDownQueue)
 		self.ui.pushButtonMoveCommandItemUp.clicked.connect(self.moveCommandUpQueue)
 
+	def setupBluetoothWorker(self):
+		self.bluetoothWorker = BluetoothWorker(self)
+		self.bluetoothWorker.message.connect(self.addBluetoothWorkerLogItem)
+		self.bluetoothWorker.start()
+
+	def addBluetoothWorkerLogItem(self, message, itemType):
+		item = LogItem(self, message, itemType)
+		self.ui.listWidgetLog.addItem(item)
+
 	### Program menu ###
 
 	def connectToDevice(self):
-		pass
+		self.bluetoothWorker.scanForDevices()
 
 	def disconnectFromDevice(self):
 		pass
@@ -200,9 +211,6 @@ class BTSerial(QMainWindow):
 		commandItem = self.ui.listWidgetQueue.takeItem(row)
 		self.ui.listWidgetQueue.insertItem(row + 1, commandItem)
 		self.ui.listWidgetQueue.setCurrentRow(row + 1)
-
-	def editCommandItem(self):
-		pass
 
 	def deleteCommandItem(self):
 		row = self.ui.listWidgetQueue.currentRow()
