@@ -89,8 +89,8 @@ def mainLoop(robot, stdscr):
 		if key is ord('q'):
 			break
 		elif key is -1:
-			robot.send('L' + chr(0) + chr(0) + chr(0))
-			robot.send('R' + chr(0) + chr(0) + chr(0))
+			robot.send('L' + chr(128) + chr(0) + chr(0))
+			robot.send('R' + chr(128) + chr(0) + chr(0))
 		elif key is ord('w'):
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(191) + chr(0) + chr(0))
