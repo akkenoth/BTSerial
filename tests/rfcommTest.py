@@ -75,8 +75,8 @@ def mainLoop(deviceAddr, deviceName):
 	stdscr = curses.initscr()
 	curses.cbreak()
 	stdscr.keypad(1)
+	stdscr.nodelay(True)
 
-	nodelay(True)
 	keyUp = keyDown = keyLeft = keyRight = False
 	while True:
 		key = stdscr.getch()
