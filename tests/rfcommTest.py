@@ -1,6 +1,5 @@
 import bluetooth
 import curses
-from time import sleep
 
 port = 3
 
@@ -79,6 +78,7 @@ def connect():
 def setupCurses():
 	stdscr = curses.initscr()
 	curses.cbreak()
+	curses.noecho()
 	stdscr.keypad(1)
 	stdscr.nodelay(True)
 	return stdscr
@@ -87,7 +87,9 @@ def mainLoop(robot, stdscr):
 	keyUp = keyDown = keyLeft = keyRight = False
 	state = 's'
 	while True:
-		sleep(0.5)
+		curses.napms(400)
+		curses.flushinp()
+		curses.napms(50)
 		key = stdscr.getch()
 		if key is ord('q'):
 			break
