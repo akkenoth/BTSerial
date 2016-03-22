@@ -85,31 +85,47 @@ def setupCurses():
 
 def mainLoop(robot, stdscr):
 	keyUp = keyDown = keyLeft = keyRight = False
+	state = 's'
 	while True:
+		sleep(0.5)
 		key = stdscr.getch()
 		if key is ord('q'):
 			break
 		elif key is -1:
+			if state is 's':
+				continue
+			state = 's'
 			stdscr.addstr(0, 0, "ROBOT STOP     ")
 			robot.send('L' + chr(128) + chr(0) + chr(0))
 			robot.send('R' + chr(128) + chr(0) + chr(0))
 		elif key is ord('w'):
+			if state is 'f':
+				continue
+			state = 'f'
 			stdscr.addstr(0, 0, "ROBOT FORWARD  ")
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(191) + chr(0) + chr(0))
 		elif key is ord('s'):
+			if state is 'b':
+				continue
+			state = 'b'
 			stdscr.addstr(0, 0, "ROBOT BACKWARD ")
 			robot.send('L' + chr(64) + chr(0) + chr(0))
 			robot.send('R' + chr(64) + chr(0) + chr(0))
 		elif key is ord('a'):
+			if state is 'l':
+				continue
+			state = 'l'
 			stdscr.addstr(0, 0, "ROBOT LEFT     ")
 			robot.send('L' + chr(64) + chr(0) + chr(0))
 			robot.send('R' + chr(191) + chr(0) + chr(0))
 		elif key is ord('d'):
+			if state is 'r':
+				continue
+			state = 'r'
 			stdscr.addstr(0, 0, "ROBOT RIGHT    ")
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(64) + chr(0) + chr(0))
-		sleep(0.1)
 
 if __name__ == '__main__':
 	main()
