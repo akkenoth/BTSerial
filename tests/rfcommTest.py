@@ -1,5 +1,6 @@
 import bluetooth
 import curses
+from time import sleep
 
 port = 3
 
@@ -108,6 +109,7 @@ def mainLoop(robot, stdscr):
 			stdscr.addstr(0, 0, "ROBOT RIGHT    ")
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(64) + chr(0) + chr(0))
+		sleep(0.1)
 
 if __name__ == '__main__':
 	main()
