@@ -87,7 +87,7 @@ def mainLoop(robot, stdscr):
 	keyUp = keyDown = keyLeft = keyRight = False
 	state = 's'
 	while True:
-		curses.napms(400)
+		curses.napms(150)
 		curses.flushinp()
 		curses.napms(50)
 		key = stdscr.getch()
@@ -105,29 +105,29 @@ def mainLoop(robot, stdscr):
 				continue
 			state = 'f'
 			stdscr.addstr(0, 0, "ROBOT FORWARD  ")
-			robot.send('L' + chr(191) + chr(0) + chr(0))
-			robot.send('R' + chr(191) + chr(0) + chr(0))
+			robot.send('L' + chr(159) + chr(0) + chr(0))
+			robot.send('R' + chr(159) + chr(0) + chr(0))
 		elif key is ord('s'):
 			if state is 'b':
 				continue
 			state = 'b'
 			stdscr.addstr(0, 0, "ROBOT BACKWARD ")
-			robot.send('L' + chr(64) + chr(0) + chr(0))
-			robot.send('R' + chr(64) + chr(0) + chr(0))
+			robot.send('L' + chr(97) + chr(0) + chr(0))
+			robot.send('R' + chr(97) + chr(0) + chr(0))
 		elif key is ord('a'):
 			if state is 'l':
 				continue
 			state = 'l'
 			stdscr.addstr(0, 0, "ROBOT LEFT     ")
-			robot.send('L' + chr(64) + chr(0) + chr(0))
-			robot.send('R' + chr(191) + chr(0) + chr(0))
+			robot.send('L' + chr(97) + chr(0) + chr(0))
+			robot.send('R' + chr(159) + chr(0) + chr(0))
 		elif key is ord('d'):
 			if state is 'r':
 				continue
 			state = 'r'
 			stdscr.addstr(0, 0, "ROBOT RIGHT    ")
-			robot.send('L' + chr(191) + chr(0) + chr(0))
-			robot.send('R' + chr(64) + chr(0) + chr(0))
+			robot.send('L' + chr(159) + chr(0) + chr(0))
+			robot.send('R' + chr(97) + chr(0) + chr(0))
 
 if __name__ == '__main__':
 	main()
