@@ -82,35 +82,35 @@ def mainLoop(robot):
 
 	lSpd = rSpd = 128
 	while True:
-		for event in pygame.event.wait():
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_q:
-					return
-				elif event.key == pygame.K_UP:
-					lSpd += 20
-					rSpd += 20
-				elif event.key == pygame.K_DOWN:
-					lSpd -= 20
-					rSpd -= 20
-				elif event.key == pygame.K_LEFT:
-					lSpd -= 20
-					rSpd += 20
-				elif event.key == pygame.K_RIGHT:
-					lSpd += 20
-					rSpd -= 20
-			elif event.type == pygame.KEYUP:
-				if event.key == pygame.K_UP:
-					lSpd -= 20
-					rSpd -= 20
-				elif event.key == pygame.K_DOWN:
-					lSpd += 20
-					rSpd += 20
-				elif event.key == pygame.K_LEFT:
-					lSpd += 20
-					rSpd -= 20
-				elif event.key == pygame.K_RIGHT:
-					lSpd -= 20
-					rSpd += 20
+		event = pygame.event.wait()
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_q:
+				return
+			elif event.key == pygame.K_UP:
+				lSpd += 20
+				rSpd += 20
+			elif event.key == pygame.K_DOWN:
+				lSpd -= 20
+				rSpd -= 20
+			elif event.key == pygame.K_LEFT:
+				lSpd -= 20
+				rSpd += 20
+			elif event.key == pygame.K_RIGHT:
+				lSpd += 20
+				rSpd -= 20
+		elif event.type == pygame.KEYUP:
+			if event.key == pygame.K_UP:
+				lSpd -= 20
+				rSpd -= 20
+			elif event.key == pygame.K_DOWN:
+				lSpd += 20
+				rSpd += 20
+			elif event.key == pygame.K_LEFT:
+				lSpd += 20
+				rSpd -= 20
+			elif event.key == pygame.K_RIGHT:
+				lSpd -= 20
+				rSpd += 20
 		robot.send('L' + chr(lSpd) + chr(0) + chr(0))
 		robot.send('R' + chr(rSpd) + chr(0) + chr(0))
 
