@@ -82,7 +82,7 @@ def mainLoop(robot):
 
 	lSpd = rSpd = 128
 	while True:
-		for event in pygame.event.get():
+		for event in pygame.event.wait():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_q:
 					return
