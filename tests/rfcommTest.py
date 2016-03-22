@@ -89,18 +89,23 @@ def mainLoop(robot, stdscr):
 		if key is ord('q'):
 			break
 		elif key is -1:
+			stdscr.addstr(0, 0, "ROBOT STOP     ")
 			robot.send('L' + chr(128) + chr(0) + chr(0))
 			robot.send('R' + chr(128) + chr(0) + chr(0))
 		elif key is ord('w'):
+			stdscr.addstr(0, 0, "ROBOT FORWARD  ")
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(191) + chr(0) + chr(0))
 		elif key is ord('s'):
+			stdscr.addstr(0, 0, "ROBOT BACKWARD ")
 			robot.send('L' + chr(64) + chr(0) + chr(0))
 			robot.send('R' + chr(64) + chr(0) + chr(0))
 		elif key is ord('a'):
+			stdscr.addstr(0, 0, "ROBOT LEFT     ")
 			robot.send('L' + chr(64) + chr(0) + chr(0))
 			robot.send('R' + chr(191) + chr(0) + chr(0))
 		elif key is ord('d'):
+			stdscr.addstr(0, 0, "ROBOT RIGHT    ")
 			robot.send('L' + chr(191) + chr(0) + chr(0))
 			robot.send('R' + chr(64) + chr(0) + chr(0))
 
