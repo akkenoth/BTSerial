@@ -98,6 +98,8 @@ def mainLoop(robot):
 			elif event.key == pygame.K_RIGHT:
 				lSpd += 20
 				rSpd -= 20
+			else:
+				continue
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_UP:
 				lSpd -= 20
@@ -111,8 +113,18 @@ def mainLoop(robot):
 			elif event.key == pygame.K_RIGHT:
 				lSpd -= 20
 				rSpd += 20
-		robot.send('L' + chr(lSpd) + chr(0) + chr(0))
-		robot.send('R' + chr(rSpd) + chr(0) + chr(0))
+			else:
+				continue
+		else:
+			continue
+
+		lCommand = 'L' + chr(lSpd) + chr(0) + chr(0)
+		rCommand = 'R' + chr(rSpd) + chr(0) + chr(0)
+
+		print(lCommand.encode('latin1'))
+		print(rCommand.encode('latin1'))
+		robot.send(lCommand.encode('latin1'))
+		robot.send(rCommand.encode('latin1'))
 
 if __name__ == '__main__':
 	main()
