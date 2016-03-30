@@ -1,3 +1,4 @@
+import bluetooth
 import serial
 import serial.tools.list_ports
 import sdl2
@@ -7,7 +8,7 @@ from ctypes import byref as getCPointer
 import sys
 
 def main():
-	window, joystick = sdlInit()
+	window, joystick = initSDL()
 	if window is None:
 		print("Error initializing SDL window.")
 		return
@@ -15,27 +16,30 @@ def main():
 		print("Error initializing Joystick.")
 		sdlQuit(window, joystick)
 		return
-	
-	connection = initSerial()
+
+	#connection = None
+	connection = initRFCOMM()
+	#connection = initSerial()
 	if connection is None:
-		print("Error initializing serial connection.")
-		sdlQuit(window, joystick)
-		return		
+		print("Error initializing connection.")
+		quitSDL(window, joystick)
+		return
 
 	window.show()
 	try:
 		mainLoop(window, joystick, connection)
 	except Exception as e:
 		print("An error occured in main loop: " + str(e))
-	serialQuit(connection)
-	sdlQuit(window, joystick)
+	#quitSerial(connection)
+	quitRFCOMM(connection)
+	quitSDL(window, joystick)
 
-def sdlInit():
+def initSDL():
 	if sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO | sdl2.SDL_INIT_JOYSTICK) != 0:
 		print(str(sdl2.SDL_GetError()))
 		return None, None
-	
-	window = sdl2.ext.Window("Gamepad/Joystick test", size=(300, 200))
+
+	window = sdl2.ext.Window("Gamepad/Joystick test", size=(600, 600))
 
 	numJoys = sdl2.joystick.SDL_NumJoysticks()
 	index = -1
@@ -97,21 +101,90 @@ def initSerial():
 		print("An error occured: " + str(e))
 		return None
 
-def serialQuit(connection):
-	connection.close()
+def quitSerial(connection):
+	if connection is not None:
+		connection.close()
 
-def sdlQuit(window, joystick):
+def initRFCOMM():
+	print("Scanning for devices (3s)...")
+	devices = []
+	try:
+		devices = bluetooth.discover_devices(duration = 3, lookup_names = True)
+	except Exception as e:
+		print("Error: %s\n" % str(e))
+		return None
+
+	devicesLength = len(devices)
+
+	print("Found %d devices!" % devicesLength)
+	if len(devices) is 0:
+		return None
+	i = 0
+	for addr, name in devices:
+		print("%d: %s [%s]" % (i, name, addr))
+		i+=1
+
+	key = input("Enter index of device to connect to: ")
+	try:
+		key = int(key)
+	except Exception as e:
+		print("Bad input!")
+		return None
+	if (key < 0) or (key > devicesLength):
+		print("Bad input!")
+		return None
+
+	(deviceAddr, deviceName) = devices[key]
+	print("Searching for services on device: %s [%s]" % (deviceName, deviceAddr))
+	services = bluetooth.find_service(address = deviceAddr)
+
+	port = None
+	if len(services) is 0:
+		key = input("No services found, input port number: ")
+		try:
+			port = int(key)
+		except Exception as e:
+			print("Bad input!")
+			return None
+	else:
+		for i in range(len(services)):
+			print("%d: %s - Port: %s" % (i, services[i]["name"], services[i]["port"]))
+		key = input("Enter index of service to conect to: ")
+		try:
+			key = int(key)
+		except Exception as e:
+			print("Bad input!")
+			return None
+		port = services[key]["port"]
+
+	print("Connecting...")
+	robot = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+	robot.connect((deviceAddr, port))
+	return robot
+
+def quitRFCOMM(connection):
+	if connection is not None:
+		connection.close()
+
+def quitSDL(window, joystick):
 	sdl2.ext.quit()
+
+def sendCommand(connection, command):
+	print("command: " + str(command))
+	if connection is not None and command is not None:
+		connection.send(command)
 
 def mainLoop(window, joystick, connection):
 	joystickID = sdl2.joystick.SDL_JoystickInstanceID(joystick)
-	lSpd = rSpd = 128
+	lSpd = rSpd = mainSpd = 0
 	event = sdl2.SDL_Event()
 	while True:
 		waitEventError = sdl2.SDL_WaitEvent(getCPointer(event))
 		if waitEventError == 0:
 			print("error waiting for event: " + str(sdl2.SDL_GetError()))
 			continue
+
+		command = None
 
 		if event.type == sdl2.SDL_QUIT:
 			print("QUIT!")
@@ -123,18 +196,36 @@ def mainLoop(window, joystick, connection):
 			print("Joystick removed!")
 			break
 		elif event.type==sdl2.SDL_JOYAXISMOTION and event.jaxis.which == joystickID:
-			print("AXIS MOTION: axis: %s, value: %s" % (str(event.jaxis.axis), str(event.jaxis.value)))
+			# Restrict to -128:128
+			value = int(event.jaxis.value) // 256
+			# Additionally, restrict to -64:64
+			value = value // 3
+			if event.jaxis.axis == 0:
+				value = value // 2
+				lSpd = value
+				rSpd = -value
+				#command = bytes((b'L', lSpd + mainSpd, 0, 0, b'R', rSpd + mainSpd, 0, 0))
+				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
+			elif event.jaxis.axis == 2:
+				mainSpd = value
+				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
 		elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
-			print("HAT MOTION: hat: %s, value: %s" % (str(event.jhat.hat), str(event.jhat.value)))
+			#hat = event.jhat.hat
+			#value = event.jhat.value
 		elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
-			print("BUTTON DOWN: button: %s" % str(event.jbutton.button))
+			#if event.jbutton.button == 0:
+			#	command = s((0x40, 1, 0, 0))
+			#if event.jbutton.button == 1:
+			#	command = s((0x41, 1, 0, 0))
 		elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
-			print("BUTTON UP: button: %s" % str(event.jbutton.button))
+			#if event.jbutton.button == 0:
+			#	command = bytes((0x40, 0, 0, 0))
+			#if event.jbutton.button == 1:
+			#	command = s((0x41, 0, 0, 0))
 		else:
 			continue
-		sys.stdout.flush()
 
-		#bytearray()
+		sendCommand(connection, command)
 
 if __name__ == '__main__':
 	main()
