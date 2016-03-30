@@ -47,7 +47,7 @@ def initSDL():
 		print("No controllers found.")
 		return window, None
 	elif numJoys == 1:
-		print("Using the only joystick found: " + str(sdl2.joystick.SDL_JoystickNameForIndex(0)))
+		print("Using the only joystick found: " + str(sdl2.joystick.SDL_JoystickNameForIndex(0), "utf-8"))
 		index = 0
 	else:
 		for i in range(numJoys):
@@ -190,11 +190,16 @@ def mainLoop(window, joystick, connection):
 			print("QUIT!")
 			break
 		elif event.type == sdl2.SDL_KEYUP and event.key.keysym.sym == sdl2.SDLK_q:
-			print("Exiting on user input!")
+			print("Exiting on user input.")
 			break
 		elif event.type == sdl2.SDL_JOYDEVICEREMOVED and event.jdevice.which == joystickID:
-			print("Joystick removed!")
-			break
+			print("Joystick disconnected!")
+		elif event.type == sdl2.SDL_JOYDEVICEADDED:
+			print("Joystick connected: " + str(sdl2.joystick.SDL_JoystickNameForIndex(event.jdevice.which), "utf-8"))
+			answer = input("Switch to connected joystick (y/n)?")
+			if answer.lower() is 'y':
+				joystick = sdl2.joystick.SDL_JoystickOpen(event.jdevice.which)
+				joystickID = sdl2.joystick.SDL_JoystickInstanceID(joystick)
 		elif event.type==sdl2.SDL_JOYAXISMOTION and event.jaxis.which == joystickID:
 			# Restrict to -128:128
 			value = int(event.jaxis.value) // 256
@@ -207,21 +212,15 @@ def mainLoop(window, joystick, connection):
 				#command = bytes((b'L', lSpd + mainSpd, 0, 0, b'R', rSpd + mainSpd, 0, 0))
 				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
 			elif event.jaxis.axis == 2:
-				mainSpd = value
+				mainSpd = -value
 				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
-		elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
+		#elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
 			#hat = event.jhat.hat
 			#value = event.jhat.value
 		elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
-			#if event.jbutton.button == 0:
-			#	command = s((0x40, 1, 0, 0))
-			#if event.jbutton.button == 1:
-			#	command = s((0x41, 1, 0, 0))
+			command = bytes((0x40 + event.jbutton.button, 1, 0, 0))
 		elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
-			#if event.jbutton.button == 0:
-			#	command = bytes((0x40, 0, 0, 0))
-			#if event.jbutton.button == 1:
-			#	command = s((0x41, 0, 0, 0))
+			command = bytes((0x40 + event.jbutton.button, 0, 0, 0))
 		else:
 			continue
 
