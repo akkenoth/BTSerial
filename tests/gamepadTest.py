@@ -5,7 +5,11 @@ import sdl2
 import sdl2.ext
 from ctypes import byref as getCPointer
 
+import threading
+import time
 import sys
+
+exitFlag = False
 
 def main():
 	window, joystick = initSDL()
@@ -14,24 +18,30 @@ def main():
 		return
 	if joystick is None:
 		print("Error initializing Joystick.")
-		sdlQuit(window, joystick)
+		quitSDL(window, joystick)
 		return
 
-	#connection = None
-	connection = initRFCOMM()
-	#connection = initSerial()
-	if connection is None:
-		print("Error initializing connection.")
+	#connectionType = "rfcomm"
+	connectionType = None
+	connection = None
+	try:
+		connection = initConnection(connectionType)
+	except Exception as e:
+		print("Error initializing connection: " + str(e))
 		quitSDL(window, joystick)
 		return
 
 	window.show()
 	try:
-		mainLoop(window, joystick, connection)
+		mainLoopThread = MainLoopThread(window, joystick, connection)
+		keepAliveThread = KeepAliveThread(connection, 2)
+		mainLoopThread.start()
+		keepAliveThread.start()
+		mainLoopThread.join()
+		keepAliveThread.join()
 	except Exception as e:
 		print("An error occured in main loop: " + str(e))
-	#quitSerial(connection)
-	quitRFCOMM(connection)
+	quitConnection(connection, connectionType)
 	quitSDL(window, joystick)
 
 def initSDL():
@@ -65,6 +75,9 @@ def initSDL():
 	joy = sdl2.joystick.SDL_JoystickOpen(index)
 
 	return window, joy
+
+def quitSDL(window, joystick):
+	sdl2.ext.quit()
 
 def initSerial():
 	ports = list(serial.tools.list_ports.comports())
@@ -166,65 +179,147 @@ def quitRFCOMM(connection):
 	if connection is not None:
 		connection.close()
 
-def quitSDL(window, joystick):
-	sdl2.ext.quit()
+def initConnection(connectionType):
+	if connectionType is "rfcomm":
+		connection = initRFCOMM()
+		if connection is None:
+			raise Exception("error initializing rfcomm")
+	elif connectionType is "serial":
+		connection = initSerial()
+		if connection is None:
+			raise Exception("error initializing serial")
+	else:
+		return None
+
+def quitConnection(connection, connectionType):
+	if connection is not None:
+		if connectionType == "rfcomm":
+			quitRFCOMM(connection)
+		elif connectionType == "serial":
+			quitSerial(connection)
 
 def sendCommand(connection, command):
 	print("command: " + str(command))
 	if connection is not None and command is not None:
 		connection.send(command)
 
-def mainLoop(window, joystick, connection):
-	joystickID = sdl2.joystick.SDL_JoystickInstanceID(joystick)
-	lSpd = rSpd = mainSpd = 0
-	event = sdl2.SDL_Event()
-	while True:
-		waitEventError = sdl2.SDL_WaitEvent(getCPointer(event))
-		if waitEventError == 0:
-			print("error waiting for event: " + str(sdl2.SDL_GetError()))
-			continue
+class MainLoopThread(threading.Thread):
+	window = None
+	joystick = None
+	connection = None
+	def __init__(self, window, joystick, connection):
+		threading.Thread.__init__(self)
+		self.window = window
+		self.joystick = joystick
+		self.connection = connection
 
-		command = None
+	def run(self):
+		global exitFlag
+		joystickDisconnected = False
+		joystickID = sdl2.joystick.SDL_JoystickInstanceID(self.joystick)
+		turnSpd = mainSpd = 0
+		event = sdl2.SDL_Event()
+		while True:
+			waitEventError = sdl2.SDL_WaitEvent(getCPointer(event))
+			if waitEventError == 0:
+				print("error waiting for event: " + str(sdl2.SDL_GetError()))
+				continue
 
-		if event.type == sdl2.SDL_QUIT:
-			print("QUIT!")
-			break
-		elif event.type == sdl2.SDL_KEYUP and event.key.keysym.sym == sdl2.SDLK_q:
-			print("Exiting on user input.")
-			break
-		elif event.type == sdl2.SDL_JOYDEVICEREMOVED and event.jdevice.which == joystickID:
-			print("Joystick disconnected!")
-		elif event.type == sdl2.SDL_JOYDEVICEADDED:
-			print("Joystick connected: " + str(sdl2.joystick.SDL_JoystickNameForIndex(event.jdevice.which), "utf-8"))
-			answer = input("Switch to connected joystick (y/n)?")
-			if answer.lower() is 'y':
-				joystick = sdl2.joystick.SDL_JoystickOpen(event.jdevice.which)
-				joystickID = sdl2.joystick.SDL_JoystickInstanceID(joystick)
-		elif event.type==sdl2.SDL_JOYAXISMOTION and event.jaxis.which == joystickID:
-			# Restrict to -128:128
-			value = int(event.jaxis.value) // 256
-			# Additionally, restrict to -64:64
-			value = value // 3
-			if event.jaxis.axis == 0:
-				value = value // 2
-				lSpd = value
-				rSpd = -value
-				#command = bytes((b'L', lSpd + mainSpd, 0, 0, b'R', rSpd + mainSpd, 0, 0))
-				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
-			elif event.jaxis.axis == 2:
-				mainSpd = -value
-				command = bytes((76, 128 + lSpd + mainSpd, 0, 0, 82, 128 + rSpd + mainSpd, 0, 0))
-		#elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
-			#hat = event.jhat.hat
-			#value = event.jhat.value
-		elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
-			command = bytes((0x40 + event.jbutton.button, 1, 0, 0))
-		elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
-			command = bytes((0x40 + event.jbutton.button, 0, 0, 0))
-		else:
-			continue
+			command = None
 
-		sendCommand(connection, command)
+			if event.type == sdl2.SDL_QUIT:
+				print("QUIT!")
+				break
+			elif event.type == sdl2.SDL_KEYUP and event.key.keysym.sym == sdl2.SDLK_q:
+				print("Exiting on user input.")
+				break
+			elif event.type == sdl2.SDL_JOYDEVICEREMOVED and event.jdevice.which == joystickID:
+				joystickDisconnected = True
+				print("Joystick disconnected!")
+				continue
+			elif event.type == sdl2.SDL_JOYDEVICEADDED:
+				if joystickDisconnected is False:
+					newJoy = sdl2.joystick.SDL_JoystickOpen(event.jdevice.which)
+					newJoyID = sdl2.joystick.SDL_JoystickInstanceID(newJoy)
+					if newJoyID == joystickID:
+						continue
+				print("Joystick connected: " + str(sdl2.joystick.SDL_JoystickNameForIndex(event.jdevice.which), "utf-8"))
+				answer = input("Switch to connected joystick (y/n)?")
+				if answer.lower() is 'y':
+					self.joystick = sdl2.joystick.SDL_JoystickOpen(event.jdevice.which)
+					joystickID = sdl2.joystick.SDL_JoystickInstanceID(self.joystick)
+					joystickDisconnected = False
+				else:
+					continue
+			elif event.type ==  sdl2.SDL_JOYAXISMOTION and event.jaxis.which == joystickID:
+				if event.jaxis.axis is not 0 and event.jaxis.axis is not 2:
+					continue
+				# Restrict to -256:256
+				value = int(event.jaxis.value) // 128
+				#print("axis %d : val %d res %d" % (event.jaxis.axis, event.jaxis.value, value))
+
+				# Controller mapping happens here
+				# TODO: make it configurable
+				if event.jaxis.axis == 0:
+					turnSpd = value // 2
+				elif event.jaxis.axis == 2:
+					mainSpd = value
+
+				signLeft = 0
+				valLeft = turnSpd + mainSpd
+				if valLeft < 0:
+					signLeft = 1
+				valLeft = abs(valLeft)
+				if valLeft >= 256:
+					valLeft = 255
+				signRight = 0
+				valRight = mainSpd - turnSpd
+				if valRight < 0:
+					signRight = 1
+				valRight = abs(valRight)
+				if valRight >= 256:
+					valRight = 255
+				#print("\tturn %d main %d left %d %d right %d %d" % (turnSpd, mainSpd, signLeft, valLeft, signRight, valRight))
+				command = bytes((0x10, 0x00, signLeft, valLeft, 0x10, 0x01, signRight, valRight))
+			elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
+				#print("button down %d" % event.jbutton.button)
+				command = bytes((0x12 + event.jbutton.button, 1, 0, 0))
+			elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
+				#print("button up   %d" % event.jbutton.button)
+				command = bytes((0x12 + event.jbutton.button, 0, 0, 0))
+			#elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
+				#hat = event.jhat.hat
+				#value = event.jhat.value
+			else:
+				continue
+
+			sendCommand(self.connection, command)
+		exitFlag = True
+		print("ending mainLoopThread, exitFlag: " + str(exitFlag))
+
+class KeepAliveThread(threading.Thread):
+	connection = None
+	interval = 3
+	def __init__(self, connection, interval = 3):
+		threading.Thread.__init__(self)
+		self.connection = connection
+		self.interval = interval
+
+	def run(self):
+		global exitFlag
+		counter = 0
+		time.sleep(self.interval)
+		while exitFlag == False:
+			try:
+				keepalive = bytes((0x04, counter % 256, 0x00, 0x00))
+				sendCommand(self.connection, keepalive)
+			except Exception as e:
+				print("keepAlive sending error: " + str(e))
+				quitEvent = sdl2.SDL_Event()
+				quitEvent.type = sdl2.SQL_QUIT
+				sdl2.SDL_PushEvent(quitEvent)
+				break
+			time.sleep(self.interval)
 
 if __name__ == '__main__':
 	main()
