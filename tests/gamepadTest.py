@@ -41,6 +41,7 @@ def main():
 		keepAliveThread.join()
 	except Exception as e:
 		print("An error occured in main loop: " + str(e))
+	sys.stdout.flush()
 	quitConnection(connection, connectionType)
 	quitSDL(window, joystick)
 
@@ -57,12 +58,12 @@ def initSDL():
 		print("No controllers found.")
 		return window, None
 	elif numJoys == 1:
-		print("Using the only joystick found: " + str(sdl2.joystick.SDL_JoystickNameForIndex(0), "utf-8"))
+		print("Using the only joystick found: " + str(sdl2.joystick.SDL_JoystickNameForIndex(0)))
 		index = 0
 	else:
 		for i in range(numJoys):
 			joyName = sdl2.joystick.SDL_JoystickNameForIndex(i)
-			print("%d: %s" % (i, str(joyName, "utf-8")))
+			print("%d: %s" % (i, str(joyName)))
 		index = input("Enter target controller index: ")
 		try:
 			index = int(index)
@@ -171,9 +172,10 @@ def initRFCOMM():
 		port = services[key]["port"]
 
 	print("Connecting...")
-	robot = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-	robot.connect((deviceAddr, port))
-	return robot
+	connection = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+	connection.connect((deviceAddr, port))
+	print("Connected to %s (%s)" % connection.getpeername())
+	return connection
 
 def quitRFCOMM(connection):
 	if connection is not None:
@@ -183,25 +185,37 @@ def initConnection(connectionType):
 	if connectionType is "rfcomm":
 		connection = initRFCOMM()
 		if connection is None:
+			print("error initializing rfcomm")
+			sys.stdout.flush()
 			raise Exception("error initializing rfcomm")
+		return connection
 	elif connectionType is "serial":
 		connection = initSerial()
 		if connection is None:
 			raise Exception("error initializing serial")
-	else:
+		return connection
+	elif connectionType is None:
+		print("Warning: initializing none-type connection")
 		return None
+	else:
+		print("Error initializing connection: bad type!")
+		raise Exception("error initializing connection: bad type")
 
 def quitConnection(connection, connectionType):
+	print("Closing connection...")
 	if connection is not None:
 		if connectionType == "rfcomm":
 			quitRFCOMM(connection)
 		elif connectionType == "serial":
 			quitSerial(connection)
+	elif connectionType is not None:
 
 def sendCommand(connection, command):
-	print("command: " + str(command))
 	if connection is not None and command is not None:
+		print("Sending command: " + str(command) + " to %s (port %s)" % connection.getpeername())
 		connection.send(command)
+	elif connection is None:
+		print("Connection is none!")
 
 class MainLoopThread(threading.Thread):
 	window = None
@@ -243,7 +257,7 @@ class MainLoopThread(threading.Thread):
 					newJoyID = sdl2.joystick.SDL_JoystickInstanceID(newJoy)
 					if newJoyID == joystickID:
 						continue
-				print("Joystick connected: " + str(sdl2.joystick.SDL_JoystickNameForIndex(event.jdevice.which), "utf-8"))
+				print("Joystick connected: " + str(sdl2.joystick.SDL_JoystickNameForIndex(event.jdevice.which)))
 				answer = input("Switch to connected joystick (y/n)?")
 				if answer.lower() is 'y':
 					self.joystick = sdl2.joystick.SDL_JoystickOpen(event.jdevice.which)
@@ -256,7 +270,6 @@ class MainLoopThread(threading.Thread):
 					continue
 				# Restrict to -256:256
 				value = int(event.jaxis.value) // 128
-				#print("axis %d : val %d res %d" % (event.jaxis.axis, event.jaxis.value, value))
 
 				# Controller mapping happens here
 				# TODO: make it configurable
@@ -264,6 +277,8 @@ class MainLoopThread(threading.Thread):
 					turnSpd = value // 2
 				elif event.jaxis.axis == 2:
 					mainSpd = value
+				else:
+					continue
 
 				signLeft = 0
 				valLeft = turnSpd + mainSpd
@@ -279,13 +294,10 @@ class MainLoopThread(threading.Thread):
 				valRight = abs(valRight)
 				if valRight >= 256:
 					valRight = 255
-				#print("\tturn %d main %d left %d %d right %d %d" % (turnSpd, mainSpd, signLeft, valLeft, signRight, valRight))
 				command = bytes((0x10, 0x00, signLeft, valLeft, 0x10, 0x01, signRight, valRight))
 			elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
-				#print("button down %d" % event.jbutton.button)
 				command = bytes((0x12, event.jbutton.button, 1, 0))
 			elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
-				#print("button up   %d" % event.jbutton.button)
 				command = bytes((0x12, event.jbutton.button, 0, 0))
 			#elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
 				#hat = event.jhat.hat
