@@ -32,17 +32,21 @@ def main():
 		return
 
 	window.show()
+	#sdl2.ext.fill(window, sdl2.ext.Color(0, 200, 50))
 	try:
 		mainLoopThread = MainLoopThread(window, joystick, connection)
 		keepAliveThread = KeepAliveThread(connection, 2)
+		receiverThread = ReceiverThread(connection)
 		mainLoopThread.start()
 		keepAliveThread.start()
+		receiverThread.start()
 		mainLoopThread.join()
 		keepAliveThread.join()
 	except Exception as e:
 		print("An error occured in main loop: " + str(e))
 	sys.stdout.flush()
 	quitConnection(connection, connectionType)
+	receiverThread.join()
 	quitSDL(window, joystick)
 
 def initSDL():
@@ -174,6 +178,7 @@ def initRFCOMM():
 	print("Connecting...")
 	connection = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 	connection.connect((deviceAddr, port))
+	connection.settimeout(5.0)
 	print("Connected to %s (%s)" % connection.getpeername())
 	return connection
 
@@ -209,6 +214,7 @@ def quitConnection(connection, connectionType):
 		elif connectionType == "serial":
 			quitSerial(connection)
 	elif connectionType is not None:
+		print("Cannot close none-type connection!")
 
 def sendCommand(connection, command):
 	if connection is not None and command is not None:
@@ -328,10 +334,37 @@ class KeepAliveThread(threading.Thread):
 			except Exception as e:
 				print("keepAlive sending error: " + str(e))
 				quitEvent = sdl2.SDL_Event()
-				quitEvent.type = sdl2.SQL_QUIT
+				quitEvent.type = sdl2.SDL_QUIT
 				sdl2.SDL_PushEvent(quitEvent)
+				exitFlag = True
 				break
 			time.sleep(self.interval)
+
+class ReceiverThread(threading.Thread):
+	connection = None
+	def __init__(self, connection):
+		threading.Thread.__init__(self)
+		self.connection = connection
+
+	def run(self):
+		global exitFlag
+		#counter = 0
+		#time.sleep(self.interval)
+		while exitFlag == False:
+			message = None
+			try:
+				message = self.connection.recv(256)
+			except Exception as e:
+				if type(e) is bluetooth.btcommon.BluetoothError:
+					continue
+				print("receiver thread error: " + str(e))
+				quitEvent = sdl2.SDL_Event()
+				quitEvent.type = sdl2.SDL_QUIT
+				sdl2.SDL_PushEvent(quitEvent)
+				exitFlag = True
+				break
+			print(">>>" + str(message))
+			sys.stdout.flush()
 
 if __name__ == '__main__':
 	main()
