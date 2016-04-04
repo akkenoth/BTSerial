@@ -21,8 +21,8 @@ def main():
 		quitSDL(window, joystick)
 		return
 
-	#connectionType = "rfcomm"
-	connectionType = None
+	connectionType = "rfcomm"
+	#connectionType = None
 	connection = None
 	try:
 		connection = initConnection(connectionType)
@@ -283,10 +283,10 @@ class MainLoopThread(threading.Thread):
 				command = bytes((0x10, 0x00, signLeft, valLeft, 0x10, 0x01, signRight, valRight))
 			elif event.type==sdl2.SDL_JOYBUTTONDOWN and event.jbutton.which == joystickID:
 				#print("button down %d" % event.jbutton.button)
-				command = bytes((0x12 + event.jbutton.button, 1, 0, 0))
+				command = bytes((0x12, event.jbutton.button, 1, 0))
 			elif event.type==sdl2.SDL_JOYBUTTONUP and event.jbutton.which == joystickID:
 				#print("button up   %d" % event.jbutton.button)
-				command = bytes((0x12 + event.jbutton.button, 0, 0, 0))
+				command = bytes((0x12, event.jbutton.button, 0, 0))
 			#elif event.type==sdl2.SDL_JOYHATMOTION and event.jhat.which == joystickID:
 				#hat = event.jhat.hat
 				#value = event.jhat.value
