@@ -135,7 +135,7 @@ def initRFCOMM():
 	devicesLength = len(devices)
 
 	print("Found %d devices!" % devicesLength)
-	if len(devices) is 0:
+	if devicesLength is 0:
 		return None
 	i = 0
 	for addr, name in devices:
