@@ -34,5 +34,4 @@ class BluetoothWorker(QThread):
 				self.deviceFound.emit(devices)
 				self.mode = None
 			else:
-				print("thread running!")
 				sleep(1)
