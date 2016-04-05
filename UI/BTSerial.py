@@ -8,6 +8,7 @@ from Commands.CommandItem import CommandItem
 from Commands.CommandType import CommandType
 from Commands.BluetoothWorker import BluetoothWorker
 from UI.CommandTypeEdit import CommandTypeEdit
+from UI.DeviceSelector import DeviceSelector
 from UI.LogItem import LogItem
 from Layouts.MainWindow import Ui_BTSerialMainWindow
 
@@ -20,7 +21,7 @@ class BTSerial(QMainWindow):
 		self.ui = Ui_BTSerialMainWindow()
 		self.ui.setupUi(self)
 		self.setupUIActions()
-		self.setupBluetoothWorker()
+		#self.setupBluetoothWorker()
 
 	def setupUIActions(self):
 		self.ui.actionConnect.triggered.connect(self.connectToDevice)
@@ -55,7 +56,8 @@ class BTSerial(QMainWindow):
 	### Program menu ###
 
 	def connectToDevice(self):
-		self.bluetoothWorker.scanForDevices()
+		#self.bluetoothWorker.scanForDevices()
+		connection = DeviceSelector.connect()
 
 	def disconnectFromDevice(self):
 		pass
